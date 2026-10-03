@@ -1,2 +1,0 @@
-# Zango
-Ride
