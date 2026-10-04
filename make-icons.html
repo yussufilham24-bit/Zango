@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ZANGO Icons Generator</title>
+</head>
+<body style="font-family: Arial, sans-serif; text-align: center; padding: 30px; background-color: #f3f4f6; color: #333;">
+
+    <h2>🟠 ZANGO Icon Generator</h2>
+    <p>Chagua rangi hapa chini, kisha bonyeza kitufe kupakua icon yako moja kwa moja!</p>
+    
+    <!-- Sehemu ya Kuchagua Rangi -->
+    <div style="margin-bottom: 25px; padding: 15px; background: white; display: inline-block; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <label for="iconColor" style="font-weight: bold; margin-right: 10px;">Chagua Rangi kuu:</label>
+        <input type="color" id="iconColor" value="#f97316" onchange="updatePreviews()" style="vertical-align: middle; cursor: pointer; width: 50px; height: 30px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    
+    <br>
+
+    <!-- Sehemu ya vitufe vya Download -->
+    <div style="margin-bottom: 25px;">
+        <button onclick="makeIcon(192)" style="padding: 15px 25px; margin: 10px; font-size: 18px; font-weight: bold; background-color: #f97316; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" id="btn192">
+            Pakua ICON 192×192
+        </button>
+        <button onclick="makeIcon(512)" style="padding: 15px 25px; margin: 10px; font-size: 18px; font-weight: bold; background-color: #f97316; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" id="btn512">
+            Pakua ICON 512×512
+        </button>
+    </div>
+
+    <!-- Sehemu ya Hakiki (Preview) -->
+    <div style="margin-top: 20px;">
+        <h3 style="color: #666;">Hakiki ya Icon yako kabla ya kupakua:</h3>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 15px;">
+            <div>
+                <p style="font-size: 14px; color: #888;">Ukubwa: 192×192</p>
+                <canvas id="preview192" style="border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 192px; height: 192px;"></canvas>
+            </div>
+            <div>
+                <p style="font-size: 14px; color: #888;">Ukubwa: 512×512 (Inaonyeshwa ikiwa ndogo hapa)</p>
+                <canvas id="preview512" style="border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 250px; height: 250px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inapakia hakiki ya kwanza ukurasa ukifunguka
+        window.onload = function() {
+            updatePreviews();
+        };
+
+        // Inahuisha muonekano wa icon rangi ikibadilika
+        function updatePreviews() {
+            const hexColor = document.getElementById("iconColor").value;
+            
+            // Kuchora upya kwenye canvas za preview
+            generateIconData(192, "preview192", hexColor);
+            generateIconData(512, "preview512", hexColor);
+            
+            // Kubadilisha rangi ya vitufe iendane na rangi iliyochaguliwa
+            document.getElementById("btn192").style.backgroundColor = hexColor;
+            document.getElementById("btn512").style.backgroundColor = hexColor;
+        }
+
+        // Kazi kuu ya kuchora muundo wa icon
+        function generateIconData(size, canvasId, color) {
+            const canvas = canvasId ? document.getElementById(canvasId) : document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+
+            /* Background kuu ya nje */
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, size, size);
+
+            /* Mraba mweupe wa ndani (Rounded square) */
+            ctx.fillStyle = "#ffffff";
+            const padding = size * 0.12;
+            const radius = size * 0.18;
+            roundRect(ctx, padding, padding, size - padding * 2, size - padding * 2, radius);
+            ctx.fill();
+
+            /* Herufi Z ya ZANGO */
+            ctx.fillStyle = color;
+            ctx.font = "900 " + (size * 0.48) + "px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("Z", size / 2, size / 2 + size * 0.02);
+
+            /* Kiduara kidogo cha usafirishaji/alama (Transport circle) */
+            ctx.beginPath();
+            ctx.arc(size * 0.76, size * 0.25, size * 0.075, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            return canvas;
+        }
+
+        // Kazi ya kupakua (Download) picha ya PNG
+        function makeIcon(size) {
+            const hexColor = document.getElementById("iconColor").value;
+            const canvas = generateIconData(size, null, hexColor);
+            
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "zango-icon-" + size + ".png";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, "image/png");
+        }
+
+        /* Kazi ya kutengeneza pembe za duara za mraba */
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+    </script>
+</body>
+</html>
